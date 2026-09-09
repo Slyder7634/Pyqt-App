@@ -90,9 +90,24 @@ QLabel[class="led"] {
     min-width: 20px;
     min-height: 20px;
 }
-QLabel[class="led"][state="on"]    { background: #32ff32; border: 1px solid #64ff64; }
-QLabel[class="led"][state="fault"] { background: #F44336; border: 1px solid #ef5350; }
-QLabel[class="led"][state="warn"]  { background: #ffa726; border: 1px solid #ef6c00; }
+/* Scoped under #sidebar deliberately. The rule
+       QWidget#sidebar QLabel { background: transparent; }
+   above carries an ID selector, which outranks a plain attribute selector —
+   an unscoped QLabel[class="led"] rule loses its background and the LED
+   renders as a coloured outline with no fill. */
+QWidget#sidebar QLabel[class="led"] {
+    background: #444444;
+    border: 1px solid #555555;
+}
+QWidget#sidebar QLabel[class="led"][state="on"] {
+    background: #32ff32; border: 1px solid #64ff64;
+}
+QWidget#sidebar QLabel[class="led"][state="fault"] {
+    background: #F44336; border: 1px solid #ef5350;
+}
+QWidget#sidebar QLabel[class="led"][state="warn"] {
+    background: #ffa726; border: 1px solid #ef6c00;
+}
 
 /* ─── Sidebar action buttons ──────────────────────────────────────────── */
 
@@ -218,6 +233,26 @@ QPushButton[class="segButton"]:checked {
     border: 2px solid #cbd5e1;
     font-weight: 700;
 }
+
+/* Mode group (SafeAuto / Jog / Auto) is red-tinted: it changes what the
+   robot is allowed to do, so it should not look like the planner toggle. */
+QPushButton#safeAutoButton, QPushButton#jogModeButton, QPushButton#autoModeButton {
+    background: #ef4444;
+    color: #ffffff;
+}
+QPushButton#safeAutoButton:hover, QPushButton#jogModeButton:hover,
+QPushButton#autoModeButton:hover { background: #dc2626; }
+
+QPushButton#safeAutoButton:checked, QPushButton#jogModeButton:checked,
+QPushButton#autoModeButton:checked {
+    background: #ffffff;
+    color: #f97316;
+    border: 2px solid #fdba74;
+    font-weight: 700;
+}
+
+QPushButton[class="jogServo"] { background: #22c55e; color: #ffffff; }
+QPushButton[class="jogServo"]:hover { background: #16a34a; }
 
 /* round off the ends of each segmented group */
 QPushButton#omplButton, QPushButton#safeAutoButton {

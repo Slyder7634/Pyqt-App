@@ -7,6 +7,8 @@ STRICT RAW DATA MODE: Shows exact values from topic/YAML with NO unit conversion
 import os
 import re
 import sys
+import importlib.util
+import threading
 import time
 import math
 from copy import deepcopy
@@ -26,6 +28,19 @@ try:
     from ethercat_msgs.srv import SetSdo
 except ImportError:
     SetSdo = None
+
+# nextup_joint_interfaces carries the status messages. Imported defensively so
+# the UI still starts (with dead LEDs) if the package is not on the path.
+try:
+    from nextup_joint_interfaces.msg import (
+        NextupDriverStatus, NextupDigitalInputs, NextupJointState,
+        NextupEmergencyTrigger,
+    )
+except ImportError:
+    NextupDriverStatus = None
+    NextupDigitalInputs = None
+    NextupJointState = None
+    NextupEmergencyTrigger = None
 from PyQt5 import QtCore, QtWidgets, uic
 
 
@@ -65,6 +80,18 @@ POINT_SLOTS = ["point1", "point2", "point3", "point4"]
 # "end" means "no transform" — ui_command_node publishes the twist directly
 # instead of rotating it through TF. Every other entry must be a real TF frame.
 DEFAULT_FRAME = "end"
+
+# Shown under "SPECIAL FRAMES" in the servo frame dropdown: (label, frame id).
+# "end" means no transform — ui_command_node publishes the twist directly.
+# ws_sim viewer, launched as a child process by the NexSim button.
+WS_SIM_SCRIPT = os.path.join(HERE, "ws_sim.py")
+NEXTUP_HMI_DIR = os.path.expanduser("~/nextup_hmi")
+
+SPECIAL_FRAMES = [
+    ("END", "end"),
+    ("BASE", "base_link"),
+    ("EXTERNAL", "external"),
+]
 
 SDO_TIMEOUT_S = 0.3
 
@@ -137,7 +164,143 @@ class ROSNode(Node):
         )
         self.joint_data = None
         self.cart_data = None
-        
+
+        # ── status / action plumbing ─────────────────────────────────────
+        self.reset_fault_pub = self.create_publisher(Bool, '/reset_fault', 10)
+        self.traj_event_pub = self.create_publisher(
+            String, '/trajectory_execution_event', 10)
+        self.emergency_pub = None
+        if NextupEmergencyTrigger is not None:
+            self.emergency_pub = self.create_publisher(
+                NextupEmergencyTrigger,
+                '/nextup_emergency_trigger_controller/commands', 10)
+
+        # Status, all six-element bool lists in joint1..joint6 order.
+        self._status_lock = threading.Lock()
+        self.op_status = [False] * 6
+        self.fault_status = [False] * 6
+        self.homing_status = [False] * 6
+        self.emergency_status = [False] * 6
+        self.drive_mode = None
+
+        if NextupDriverStatus is not None:
+            self.create_subscription(
+                NextupDriverStatus, '/nextup_driver_status',
+                self._driver_status_callback, 10)
+        if NextupDigitalInputs is not None:
+            self.create_subscription(
+                NextupDigitalInputs, '/nextup_digital_inputs',
+                self._digital_inputs_callback, 10)
+        if NextupJointState is not None:
+            self.create_subscription(
+                NextupJointState, '/nextup_joint_states',
+                self._nextup_joint_state_callback, 10)
+
+    # ── status callbacks ─────────────────────────────────────────────────
+    def _driver_status_callback(self, msg):
+        """Operational and fault LEDs.
+
+        The message carries a name[] array, and the driver order is not
+        guaranteed, so every field is indexed by joint name rather than by
+        position. A joint missing from the message reads as false.
+        """
+        op = [False] * 6
+        fault = [False] * 6
+        names = list(msg.name)
+        for i, joint in enumerate(JOINTS):
+            if joint in names:
+                idx = names.index(joint)
+                if idx < len(msg.op_status):
+                    op[i] = bool(msg.op_status[idx])
+                if idx < len(msg.fault):
+                    fault[i] = bool(msg.fault[idx])
+        with self._status_lock:
+            self.op_status = op
+            self.fault_status = fault
+
+    def _digital_inputs_callback(self, msg):
+        """Emergency LEDs come from digital input 5, one per drive."""
+        di5 = list(getattr(msg, "di5", []) or [])
+        with self._status_lock:
+            self.emergency_status = [
+                bool(di5[i]) if i < len(di5) else False for i in range(6)]
+
+    def _nextup_joint_state_callback(self, msg):
+        """Homing LEDs and the current drive mode.
+
+        A joint counts as homed when its position rounds to zero at three
+        decimal places — the same test the web UI uses, so both agree.
+        """
+        names = list(msg.name)
+        homed = [False] * 6
+        for i, joint in enumerate(JOINTS):
+            if joint in names:
+                idx = names.index(joint)
+                if idx < len(msg.position):
+                    homed[i] = f"{abs(msg.position[idx]):.3f}" == "0.000"
+
+        mode = None
+        modes = getattr(msg, "modeofoperation", None)
+        if modes is not None and len(modes) > 0:
+            mode = int(modes[0])
+
+        with self._status_lock:
+            self.homing_status = homed
+            if mode is not None:
+                self.drive_mode = mode
+
+    def get_status(self):
+        """Snapshot of all status rows, for the GUI thread to read."""
+        with self._status_lock:
+            return {
+                "op": list(self.op_status),
+                "fault": list(self.fault_status),
+                "homing": list(self.homing_status),
+                "emergency": list(self.emergency_status),
+                "drive_mode": self.drive_mode,
+            }
+
+    # ── actions ──────────────────────────────────────────────────────────
+    def trigger_emergency(self):
+        if self.emergency_pub is None:
+            return False
+        msg = NextupEmergencyTrigger()
+        msg.emergencytrigger = True
+        self.emergency_pub.publish(msg)
+        return True
+
+    def publish_reset_fault(self):
+        msg = Bool()
+        msg.data = True
+        self.reset_fault_pub.publish(msg)
+
+    def stop_moveit(self):
+        """Abort the running trajectory — the native form of stopMoveit()."""
+        msg = String()
+        msg.data = "stop"
+        self.traj_event_pub.publish(msg)
+
+    def publish_ui_command(self, command):
+        msg = String()
+        msg.data = command
+        self.ui_cmd_pub.publish(msg)
+
+    def wait_for_drive_mode(self, target, timeout_s):
+        """Block until /nextup_joint_states reports the target drive mode.
+
+        Returns (confirmed, seconds_waited). Already being at the target
+        returns immediately, which the HOME sequence relies on to tell a real
+        transition apart from a no-op.
+        """
+        start = time.monotonic()
+        deadline = start + timeout_s
+        while time.monotonic() < deadline:
+            with self._status_lock:
+                if self.drive_mode == target:
+                    return True, time.monotonic() - start
+            time.sleep(0.02)
+        return False, time.monotonic() - start
+
     def joint_callback(self, msg):
         self.joint_data = msg.data
         
@@ -737,6 +900,162 @@ class WsCalibrationDialog(QtWidgets.QDialog):
             return False
 
 
+class HomeWorker(QtCore.QObject):
+    """The HOME sequence, mirroring wsHandler.js.
+
+      1. write the SafeAuto overspeed profile to all 6 drives (continue even
+         if some fail — homing proceeds regardless)
+      2. publish /change_mode 8
+      3. wait up to 3s for /nextup_joint_states to confirm mode 8
+      4. settle, then publish "home" on /ui_commands
+
+    The settle in step 4 is the subtle part. A confirmed 9->8 transition proves
+    the drive arrived, so it needs only a short guard. A drive ALREADY at 8
+    gives no confirmation edge — wait_for_drive_mode returns instantly — so it
+    needs the full blind wait. If the 3s wait timed out, that time has already
+    elapsed and no further settle is needed.
+    """
+
+    progress = QtCore.pyqtSignal(str, int)
+    finished = QtCore.pyqtSignal(bool, str)
+
+    BLIND_SETTLE_S = 2.0        # already at mode 8, no feedback to rely on
+    CONFIRMED_GUARD_S = 0.5     # feedback confirmed a real 9 -> 8 transition
+    MODE_TIMEOUT_S = 3.0
+
+    def __init__(self, ros_node):
+        super().__init__()
+        self.ros = ros_node
+
+    @QtCore.pyqtSlot()
+    def run(self):
+        cfg = load_overspeed_config()
+        profile = cfg.get("safeauto")
+        if profile is None:
+            self.finished.emit(False, "No safeauto overspeed profile")
+            return
+
+        index = cfg.get("index", 0x200A)
+        subindex = cfg.get("subindex", 0x09)
+        dtype = cfg.get("type", "uint16")
+
+        # 1) Overspeed first, best-effort.
+        overspeed_ok = True
+        failures = []
+        for i, joint in enumerate(JOINTS):
+            self.progress.emit(f"overspeed {joint}", int(i / 6 * 40))
+            ok, msg = self.ros.write_overspeed(
+                i, index, subindex, dtype, profile[joint])
+            if not ok:
+                overspeed_ok = False
+                failures.append(f"{joint}: {msg}")
+
+        # 2) Change to drive mode 8. Capture where we are coming FROM, because
+        #    the settle below depends on whether this is a real transition.
+        with self.ros._status_lock:
+            prior_mode = self.ros.drive_mode
+        self.progress.emit("change_mode 8", 45)
+        self.ros.publish_change_mode("8")
+
+        # 3) Confirm via feedback.
+        confirmed, waited = self.ros.wait_for_drive_mode(8, self.MODE_TIMEOUT_S)
+        self.progress.emit(
+            "mode 8 confirmed" if confirmed else "mode 8 unconfirmed", 70)
+
+        # 4) Settle.
+        if not confirmed:
+            settle = 0.0
+        elif prior_mode == 9:
+            settle = self.CONFIRMED_GUARD_S
+        else:
+            settle = max(0.0, self.BLIND_SETTLE_S - waited)
+
+        if settle > 0:
+            self.progress.emit(f"settling {settle:.1f}s", 85)
+            time.sleep(settle)
+
+        self.ros.publish_ui_command("home")
+        self.progress.emit("home published", 100)
+
+        if overspeed_ok:
+            message = ("Homing started (SafeAuto)" if confirmed
+                       else "Homing started (SafeAuto, mode unconfirmed)")
+        else:
+            message = ("Homing started; overspeed incomplete: "
+                       + "; ".join(failures))
+        self.finished.emit(True, message)
+
+
+class ResetWorker(QtCore.QObject):
+    """The RESET sequence, mirroring wsHandler.js.
+
+      1. abort any running trajectory
+      2. trigger emergency (this is what actually clears the fault latch)
+      3. wait 1.5s, publish /reset_fault
+      4. wait 2.5s for the reset state machine to settle
+      5. reset lands the drive in mode 9, so write the Jog overspeed profile
+
+    The 1.5s and 2.5s gaps are the drive's, not ours — shortening them means
+    writing thresholds into a drive that is still resetting.
+    """
+
+    progress = QtCore.pyqtSignal(str, int)
+    finished = QtCore.pyqtSignal(bool, str)
+
+    RESET_FAULT_DELAY_S = 1.5
+    RESET_SETTLE_S = 2.5
+
+    def __init__(self, ros_node):
+        super().__init__()
+        self.ros = ros_node
+
+    @QtCore.pyqtSlot()
+    def run(self):
+        self.progress.emit("stopping trajectory", 5)
+        self.ros.stop_moveit()
+
+        self.progress.emit("triggering emergency", 10)
+        if not self.ros.trigger_emergency():
+            self.finished.emit(
+                False, "nextup_joint_interfaces not installed — "
+                       "cannot publish the emergency trigger")
+            return
+
+        self.progress.emit("waiting before reset_fault", 20)
+        time.sleep(self.RESET_FAULT_DELAY_S)
+
+        self.progress.emit("/reset_fault", 35)
+        self.ros.publish_reset_fault()
+
+        self.progress.emit("waiting for reset to settle", 45)
+        time.sleep(self.RESET_SETTLE_S)
+
+        cfg = load_overspeed_config()
+        profile = cfg.get("jog")
+        if profile is None:
+            self.finished.emit(True, "Reset complete (no jog overspeed profile)")
+            return
+
+        index = cfg.get("index", 0x200A)
+        subindex = cfg.get("subindex", 0x09)
+        dtype = cfg.get("type", "uint16")
+
+        failures = []
+        for i, joint in enumerate(JOINTS):
+            self.progress.emit(f"overspeed {joint}", 55 + int(i / 6 * 45))
+            ok, msg = self.ros.write_overspeed(
+                i, index, subindex, dtype, profile[joint])
+            if not ok:
+                failures.append(f"{joint}: {msg}")
+
+        self.progress.emit("complete", 100)
+        if failures:
+            self.finished.emit(
+                True, "Reset complete; overspeed incomplete: " + "; ".join(failures))
+        else:
+            self.finished.emit(True, "Reset complete (Jog)")
+
+
 class YamlViewerDialog(QtWidgets.QDialog):
     """Small read-only window showing the points YAML."""
 
@@ -882,6 +1201,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _update_from_ros(self):
         """Update UI displays from ROS data. STRICT RAW DISPLAY."""
+        # Status LEDs update regardless of whether a point is being loaded —
+        # they are safety indicators and must never be stale.
+        self._refresh_status()
+
         if self.is_loading_point:
             return
 
@@ -992,7 +1315,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # Guarded because this runs once before _setup_frames has built them.
         if hasattr(self, "current_frame"):
             self._refresh_servo_frames()
-            self._refresh_tf_frames()
 
     def _on_list_selection(self):
         row = self.pointList.currentRow()
@@ -1379,6 +1701,197 @@ class MainWindow(QtWidgets.QMainWindow):
         self.jogServoButton.clicked.connect(self.start_servo)
         self.wsCalibrationButton.clicked.connect(self.open_ws_calibration)
 
+        # ws_sim runs as a child process, not a widget. See toggle_ws_sim.
+        self.ws_sim_process = None
+        self.nexSimButton.setCheckable(True)
+        self.nexSimButton.clicked.connect(self.toggle_ws_sim)
+
+        self.keyboardPendantButton.clicked.connect(self.toggle_keyboard_pendant)
+        self._pendant_active = False
+
+    # ── ws_sim (NexSim) ──────────────────────────────────────────────────
+    def _ws_sim_preflight(self):
+        """Return a human-readable reason ws_sim cannot run, or None.
+
+        Checked before launching, because a child that dies during import
+        looks exactly like "nothing happened" from the user's side.
+        """
+        if not os.path.isfile(WS_SIM_SCRIPT):
+            return (f"ws_sim.py not found at:\n{WS_SIM_SCRIPT}\n\n"
+                    "It should sit next to main.py, or change WS_SIM_SCRIPT.")
+
+        if not os.path.isdir(NEXTUP_HMI_DIR):
+            return (f"nextup_hmi checkout not found at:\n{NEXTUP_HMI_DIR}\n\n"
+                    "Clone it:\n  git clone "
+                    f"https://github.com/Slyder7634/nextup_hmi.git {NEXTUP_HMI_DIR}"
+                    "\n\nOr change NEXTUP_HMI_DIR at the top of main.py.")
+
+        if not os.path.isfile(os.path.join(NEXTUP_HMI_DIR, "viewer_widget.py")):
+            return (f"{NEXTUP_HMI_DIR} exists but contains no viewer_widget.py.\n\n"
+                    "Is NEXTUP_HMI_DIR pointing at the right checkout?")
+
+        # The child runs under this same interpreter, so checking here names
+        # the missing package instead of leaving a silent exit.
+        missing = [m for m in ("PyQt6", "vtk")
+                   if importlib.util.find_spec(m) is None]
+        if missing:
+            names = " ".join(missing)
+            return (f"Missing Python package(s) for:\n  {sys.executable}\n\n"
+                    f"  {names}\n\nInstall with:\n  pip install {names}")
+
+        return None
+
+    def toggle_ws_sim(self):
+        """Start or stop the ws_sim viewer process.
+
+        Separate process rather than an embedded widget: nextup_hmi is PyQt6
+        and this app is PyQt5, so one process cannot host both Qt builds; and
+        VTK plus a TF listener costs CPU that only dies with the process.
+        """
+        if self.ws_sim_process is not None:
+            self.stop_ws_sim()
+            return
+
+        problem = self._ws_sim_preflight()
+        if problem:
+            self.nexSimButton.setChecked(False)
+            QtWidgets.QMessageBox.warning(self, "Cannot start ws_sim", problem)
+            return
+
+        process = QtCore.QProcess(self)
+        process.setProgram(sys.executable)
+        # -u keeps the child unbuffered so a crash message reaches us before
+        # the pipe is torn down.
+        process.setArguments(["-u", WS_SIM_SCRIPT])
+        process.setProcessChannelMode(QtCore.QProcess.MergedChannels)
+        process.readyReadStandardOutput.connect(self._ws_sim_output)
+        process.finished.connect(self._ws_sim_finished)
+        process.errorOccurred.connect(self._ws_sim_error)
+
+        env = QtCore.QProcessEnvironment.systemEnvironment()
+        if NEXTUP_HMI_DIR:
+            env.insert("NEXTUP_HMI_DIR", NEXTUP_HMI_DIR)
+        process.setProcessEnvironment(env)
+
+        self._ws_sim_log = []
+        self._ws_sim_started_at = time.monotonic()
+        process.start()
+        if not process.waitForStarted(3000):
+            self.nexSimButton.setChecked(False)
+            QtWidgets.QMessageBox.warning(
+                self, "ws_sim failed to start", process.errorString())
+            return
+
+        self.ws_sim_process = process
+        self.nexSimButton.setChecked(True)
+        self.statusbar.showMessage("ws_sim starting...", 3000)
+
+    def _ws_sim_output(self):
+        process = self.ws_sim_process
+        if process is None:
+            return
+        text = bytes(process.readAllStandardOutput()).decode(
+            "utf-8", errors="replace")
+        if text.strip():
+            self._ws_sim_log.append(text)
+            print(f"[ws_sim] {text.rstrip()}", flush=True)
+
+    def stop_ws_sim(self):
+        process = self.ws_sim_process
+        if process is None:
+            return
+
+        # Disconnect first: terminate() fires finished(), and that handler
+        # must not re-enter while we are already tearing down.
+        try:
+            process.finished.disconnect(self._ws_sim_finished)
+        except (TypeError, RuntimeError):
+            pass
+
+        process.terminate()                 # SIGTERM — ws_sim shuts ROS down
+        if not process.waitForFinished(4000):
+            process.kill()                  # ignored us; take it down hard
+            process.waitForFinished(1000)
+
+        self.ws_sim_process = None
+        self.nexSimButton.setChecked(False)
+        self.statusbar.showMessage("ws_sim stopped", 3000)
+
+    def _ws_sim_finished(self, code, _status):
+        """The viewer exited on its own — window closed, or it died."""
+        self._ws_sim_output()               # drain anything still buffered
+        self.ws_sim_process = None
+        self.nexSimButton.setChecked(False)
+
+        lifetime = time.monotonic() - getattr(self, "_ws_sim_started_at", 0.0)
+        log = "".join(getattr(self, "_ws_sim_log", [])).strip()
+
+        # Clean exit after a while means the user closed the window. A
+        # non-zero code, or any exit within ~2s, means it never came up — and
+        # that must not be a status-bar message nobody reads.
+        if code == 0 and lifetime > 2.0:
+            self.statusbar.showMessage("ws_sim closed", 3000)
+            return
+
+        self.statusbar.showMessage(f"ws_sim exited with code {code}", 8000)
+        box = QtWidgets.QMessageBox(self)
+        box.setIcon(QtWidgets.QMessageBox.Warning)
+        box.setWindowTitle("ws_sim exited")
+        box.setText(f"ws_sim stopped after {lifetime:.1f}s (exit code {code}).")
+        box.setInformativeText("Output from the viewer process is below.")
+        box.setDetailedText(log or "(no output)")
+        box.exec_()
+
+    def _ws_sim_error(self, _error):
+        process = self.ws_sim_process
+        if process is None:
+            return
+        self.statusbar.showMessage(f"ws_sim error: {process.errorString()}", 6000)
+    # ── keyboard pendant ─────────────────────────────────────────────────
+    def toggle_keyboard_pendant(self):
+        """Jog from the keyboard: 1-6 pick a joint, arrows drive it.
+
+        Installs an application-wide event filter so the keys work wherever
+        focus happens to be. Off by default because a stray keypress moving
+        the arm is exactly the kind of surprise a pendant should not spring.
+        """
+        self._pendant_active = not self._pendant_active
+        self.keyboardPendantButton.setChecked(self._pendant_active)
+
+        if self._pendant_active:
+            QtWidgets.QApplication.instance().installEventFilter(self)
+            self.statusbar.showMessage(
+                "Keyboard pendant ON — 1-6 select joint, Up/Down to jog", 5000)
+        else:
+            QtWidgets.QApplication.instance().removeEventFilter(self)
+            self.jog_release()
+            self.statusbar.showMessage("Keyboard pendant OFF", 3000)
+
+    def eventFilter(self, obj, event):
+        if not self._pendant_active:
+            return super().eventFilter(obj, event)
+
+        # Ignore auto-repeat: the jog command is already repeating on its own
+        # timer, and a second stream would fight it.
+        if event.type() == QtCore.QEvent.KeyPress and not event.isAutoRepeat():
+            key = event.key()
+            if QtCore.Qt.Key_1 <= key <= QtCore.Qt.Key_6:
+                self._pendant_axis = key - QtCore.Qt.Key_1 + 1
+                self.statusbar.showMessage(
+                    f"Pendant axis J{self._pendant_axis}", 2000)
+                return True
+            if key in (QtCore.Qt.Key_Up, QtCore.Qt.Key_Down):
+                axis = getattr(self, "_pendant_axis", 1)
+                self.jog_press("joint", axis, +1 if key == QtCore.Qt.Key_Up else -1)
+                return True
+
+        if event.type() == QtCore.QEvent.KeyRelease and not event.isAutoRepeat():
+            if event.key() in (QtCore.Qt.Key_Up, QtCore.Qt.Key_Down):
+                self.jog_release()
+                return True
+
+        return super().eventFilter(obj, event)
+
     def start_servo(self):
         self.jogServoButton.setEnabled(False)
         self.statusbar.showMessage("Starting servo...")
@@ -1410,13 +1923,190 @@ class MainWindow(QtWidgets.QMainWindow):
         self.leds = {}
         for prefix in ("op", "fault", "homing", "emergency"):
             self.leds[prefix] = [getattr(self, f"{prefix}Led{i}") for i in range(1, 7)]
-        self.set_led_row("op", [True] * 6)
-        self.set_led_row("homing", [True, True, True, False, False, False])
+
+        # Everything starts dark; the first status message lights it up. No
+        # demo values, so a dead topic looks dead instead of looking healthy.
+        for prefix in self.leds:
+            self.set_led_row(prefix, [False] * 6)
+
+        self.robot_status = {
+            "op": [False] * 6,
+            "fault": [False] * 6,
+            "homing": [False] * 6,
+            "emergency": [False] * 6,
+            "drive_mode": None,
+        }
+        self._home_in_flight = False
+        self._action_busy = False
+
+        self.homeButton.clicked.connect(self.do_home)
+        self.resetButton.clicked.connect(self.do_reset)
+        self.motionResetButton.clicked.connect(self.do_motion_reset)
+        self.emergencyStopButton.clicked.connect(self.do_emergency_stop)
 
     def set_led_row(self, prefix, states, on_state="on"):
         for led, active in zip(self.leds[prefix], states):
             led.setProperty("state", on_state if active else "")
             restyle(led)
+
+    def _refresh_status(self):
+        """Pull the latest status from the ROS node and repaint the LEDs.
+
+        Called from the existing 50ms GUI timer. Rows are only re-polished
+        when they actually change — unpolish/polish on 24 widgets at 20Hz is
+        wasteful and makes the whole UI feel sluggish.
+        """
+        status = self.ros_node.get_status()
+
+        for prefix, on_state in (("op", "on"), ("fault", "fault"),
+                                 ("homing", "on"), ("emergency", "fault")):
+            if status[prefix] != self.robot_status[prefix]:
+                self.set_led_row(prefix, status[prefix], on_state)
+                self.robot_status[prefix] = status[prefix]
+
+        self.robot_status["drive_mode"] = status["drive_mode"]
+        self._update_button_states()
+
+    # ── derived status ───────────────────────────────────────────────────
+    @property
+    def all_operational(self):
+        return all(self.robot_status["op"])
+
+    @property
+    def any_emergency(self):
+        return any(self.robot_status["emergency"])
+
+    @property
+    def any_fault(self):
+        return any(self.robot_status["fault"])
+
+    def _update_button_states(self):
+        """HOME needs every joint operational and no emergency; RESET only
+        needs no emergency. Both are blocked while another action runs."""
+        home_ok = (self.all_operational
+                   and not self.any_emergency
+                   and not self._home_in_flight
+                   and not self._action_busy)
+        self.homeButton.setEnabled(home_ok)
+
+        reset_ok = not self.any_emergency and not self._action_busy
+        self.resetButton.setEnabled(reset_ok)
+        self.motionResetButton.setEnabled(reset_ok)
+        # EMERGENCY STOP is never disabled. It must work regardless of state.
+
+    # ── sidebar actions ──────────────────────────────────────────────────
+    def do_home(self):
+        if self._home_in_flight or self._action_busy:
+            return
+        if not self.all_operational:
+            QtWidgets.QMessageBox.warning(
+                self, "Cannot HOME", "Not all joints are operational.")
+            return
+        if self.any_emergency:
+            QtWidgets.QMessageBox.warning(
+                self, "Cannot HOME", "Emergency condition detected.")
+            return
+
+        self._home_in_flight = True
+        self._action_busy = True
+        self._update_button_states()
+        self.statusbar.showMessage("Homing...")
+
+        worker = HomeWorker(self.ros_node)
+        worker.progress.connect(self._action_progress)
+        self._run_worker(worker, self._home_finished)
+
+        # Safety re-enable: if the worker somehow never reports, the button
+        # must not stay dead forever.
+        self._home_guard = QtCore.QTimer(self)
+        self._home_guard.setSingleShot(True)
+        self._home_guard.timeout.connect(self._home_timed_out)
+        self._home_guard.start(15000)
+
+    def _home_timed_out(self):
+        if self._home_in_flight:
+            self._home_in_flight = False
+            self._action_busy = False
+            self._update_button_states()
+            self.statusbar.showMessage("Home: no result received", 6000)
+
+    def _home_finished(self, ok, message):
+        if hasattr(self, "_home_guard"):
+            self._home_guard.stop()
+        self._home_in_flight = False
+        self._action_busy = False
+        self._update_button_states()
+        if ok:
+            self.statusbar.showMessage(message, 5000)
+            # Home runs at SafeAuto thresholds; reflect that in the mode row.
+            self.current_mode = "safeauto"
+            self._set_mode_buttons("safeauto")
+        else:
+            self.statusbar.showMessage(f"Home failed: {message}", 8000)
+            QtWidgets.QMessageBox.warning(self, "Home failed", message)
+
+    def do_reset(self):
+        if self._action_busy:
+            return
+        if self.any_emergency:
+            QtWidgets.QMessageBox.warning(
+                self, "Cannot RESET", "Emergency condition detected.")
+            return
+
+        self._action_busy = True
+        self._update_button_states()
+        self.statusbar.showMessage("Resetting...")
+
+        worker = ResetWorker(self.ros_node)
+        worker.progress.connect(self._action_progress)
+        self._run_worker(worker, self._reset_finished)
+
+    def _reset_finished(self, ok, message):
+        self._action_busy = False
+        self._update_button_states()
+        if ok:
+            self.statusbar.showMessage(message, 5000)
+            # Reset leaves the drive in mode 9 — that is Jog.
+            self.current_mode = "jog"
+            self._set_mode_buttons("jog")
+        else:
+            self.statusbar.showMessage(f"Reset failed: {message}", 8000)
+            QtWidgets.QMessageBox.warning(self, "Reset failed", message)
+
+    def do_motion_reset(self):
+        """Abort the running trajectory only.
+
+        Deliberately does NOT reset faults or touch drive mode — in the web UI
+        this button just calls stopMoveit(). It is the soft stop.
+        """
+        if self.any_emergency:
+            QtWidgets.QMessageBox.warning(
+                self, "Cannot RESET", "Emergency condition detected.")
+            return
+        self.ros_node.stop_moveit()
+        self.statusbar.showMessage("Motion reset — trajectory aborted", 3000)
+        self._cooldown(self.motionResetButton)
+
+    def do_emergency_stop(self):
+        """No guards and no confirmation dialog — an e-stop that asks
+        'are you sure?' is not an e-stop."""
+        if not self.ros_node.trigger_emergency():
+            QtWidgets.QMessageBox.critical(
+                self, "EMERGENCY STOP FAILED",
+                "nextup_joint_interfaces is not installed, so the emergency "
+                "trigger could not be published.\n\n"
+                "Use the physical e-stop.")
+            return
+        self.statusbar.showMessage("EMERGENCY TRIGGERED", 10000)
+
+    def _action_progress(self, message, percent):
+        self.statusbar.showMessage(f"{percent}% — {message}")
+
+    def _cooldown(self, button, ms=2000):
+        """Briefly disable a button so it cannot be spammed."""
+        button.setEnabled(False)
+        QtCore.QTimer.singleShot(
+            ms, lambda: (button.setEnabled(True), self._update_button_states()))
 
     # ── frames ────────────────────────────────────────────────────────────
     def _setup_frames(self):
@@ -1429,28 +2119,66 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         self.current_frame = load_saved_frame()
         self._refresh_servo_frames()
-        self.servoFrameSelect.currentTextChanged.connect(self._on_frame_changed)
-        self._refresh_tf_frames()
+        self.servoFrameSelect.currentIndexChanged.connect(self._on_frame_changed)
 
     def _refresh_servo_frames(self):
-        names = [DEFAULT_FRAME]
-        names += [str(p.get("name", "")) for p in self.points
-                  if p.get("is_tf") and p.get("name")]
+        """Rebuild the frame list: special frames, then TF points.
+
+        The section headers are inserted as disabled items so the combo reads
+        like the web UI's grouped menu. Only points with is_tf true appear
+        under TF POINTS — tf_loader_node publishes exactly those as TF frames,
+        so anything else would fail lookupTransform in ui_command_node.
+        """
+        model_items = []
+        for label, value in SPECIAL_FRAMES:
+            model_items.append((label, value))
+
+        tf_points = [str(p.get("name", "")) for p in self.points
+                     if p.get("is_tf") and p.get("name")]
 
         self.servoFrameSelect.blockSignals(True)
         self.servoFrameSelect.clear()
-        self.servoFrameSelect.addItems(names)
-        if self.current_frame in names:
-            self.servoFrameSelect.setCurrentText(self.current_frame)
+
+        self._add_combo_header("SPECIAL FRAMES")
+        for label, value in model_items:
+            self.servoFrameSelect.addItem(label, value)
+
+        self._add_combo_header("TF POINTS")
+        if tf_points:
+            for name in tf_points:
+                self.servoFrameSelect.addItem(name, name)
         else:
-            # The saved frame no longer exists as a TF point; fall back rather
-            # than leaving the UI pointing at a frame the robot cannot resolve.
+            self._add_combo_header("No TF points", italic=True)
+
+        valid = [v for _, v in model_items] + tf_points
+        if self.current_frame not in valid:
+            # The saved frame is gone (point deleted or is_tf turned off).
+            # Fall back rather than leaving the UI pointing at a frame the
+            # robot cannot resolve.
             self.current_frame = DEFAULT_FRAME
-            self.servoFrameSelect.setCurrentText(DEFAULT_FRAME)
+
+        index = self.servoFrameSelect.findData(self.current_frame)
+        if index >= 0:
+            self.servoFrameSelect.setCurrentIndex(index)
+
         self.servoFrameSelect.blockSignals(False)
         self.activeFrameBadge.setText(f"ACTIVE  {self.current_frame}")
 
-    def _on_frame_changed(self, frame):
+    def _add_combo_header(self, text, italic=False):
+        """A non-selectable label row inside the combo."""
+        combo = self.servoFrameSelect
+        combo.addItem(text)
+        index = combo.count() - 1
+        item = combo.model().item(index)
+        item.setEnabled(False)
+        font = item.font()
+        font.setBold(not italic)
+        font.setItalic(italic)
+        font.setPointSize(max(8, font.pointSize() - 1))
+        item.setFont(font)
+
+    def _on_frame_changed(self, _index):
+        frame = self.servoFrameSelect.currentData()
         if not frame:
             return
         self.current_frame = frame
@@ -1459,9 +2187,6 @@ class MainWindow(QtWidgets.QMainWindow):
         save_servo_frame(frame)
         self.statusbar.showMessage(f"Servo frame: {frame}", 2500)
 
-    def _refresh_tf_frames(self):
-        self.tfFrameSelect.clear()
-        self.tfFrameSelect.addItems([f"{p.get('name', '')}-tf" for p in self.points])
 
     # ── jog ────────────────────────────────────────────────────────────────
     def _setup_jog(self):
@@ -1518,6 +2243,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.systemStatusLabel.setText(f"TIME : {now}\nUpTime: --\nLoad: {load_text}")
 
     def closeEvent(self, event):
+        # Stop the arm before anything else — if a jog button is still held,
+        # the drive keeps its last velocity once we stop publishing.
+        try:
+            self.jog_release()
+        except Exception:
+            pass
+        # The viewer is a child process and would outlive us otherwise.
+        self.stop_ws_sim()
         if self.ros_node:
             self.ros_node.destroy_node()
         super().closeEvent(event)
