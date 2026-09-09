@@ -1,0 +1,1956 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry"><rect><x>0</x><y>0</y><width>1920</width><height>1080</height></rect></property>
+  <property name="windowTitle"><string>NextUp Robot Control</string></property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="rootLayout">
+    <property name="spacing"><number>0</number></property>
+    <property name="leftMargin"><number>0</number></property>
+    <property name="rightMargin"><number>0</number></property>
+    <property name="topMargin"><number>0</number></property>
+    <property name="bottomMargin"><number>0</number></property>
+    <item>
+     <widget class="QWidget" name="sidebar" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>250</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>250</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <layout class="QVBoxLayout" name="sidebarLayout">
+       <property name="spacing"><number>6</number></property>
+       <property name="leftMargin"><number>10</number></property>
+       <property name="rightMargin"><number>10</number></property>
+       <property name="topMargin"><number>14</number></property>
+       <property name="bottomMargin"><number>12</number></property>
+       <item>
+        <widget class="QLabel" name="projectManagerTitle">
+         <property name="text"><string>Project Manager</string></property>
+         <property name="class" stdset="0"><string notr="true">pmTitle</string></property>
+         <property name="alignment"><set>Qt::AlignCenter</set></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="activeProjectName">
+         <property name="text"><string>displayProject</string></property>
+         <property name="class" stdset="0"><string notr="true">pmSubtitle</string></property>
+         <property name="alignment"><set>Qt::AlignCenter</set></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="navPointPlanning">
+         <property name="text"><string>Point Planning</string></property>
+         <property name="class" stdset="0"><string notr="true">navButton</string></property>
+         <property name="checkable"><bool>true</bool></property>
+         <property name="checked"><bool>true</bool></property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>52</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="navPathPlanning">
+         <property name="text"><string>Path Planning</string></property>
+         <property name="class" stdset="0"><string notr="true">navButton</string></property>
+         <property name="checkable"><bool>true</bool></property>
+         <property name="checked"><bool>false</bool></property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>52</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="navIoControl">
+         <property name="text"><string>IO Control</string></property>
+         <property name="class" stdset="0"><string notr="true">navButton</string></property>
+         <property name="checkable"><bool>true</bool></property>
+         <property name="checked"><bool>false</bool></property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>52</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="navMainTree">
+         <property name="text"><string>Main Tree</string></property>
+         <property name="class" stdset="0"><string notr="true">navButton</string></property>
+         <property name="checkable"><bool>true</bool></property>
+         <property name="checked"><bool>false</bool></property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>52</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="navClientControl">
+         <property name="text"><string>Client Control</string></property>
+         <property name="class" stdset="0"><string notr="true">navButton</string></property>
+         <property name="checkable"><bool>true</bool></property>
+         <property name="checked"><bool>false</bool></property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>52</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="navErrorHandling">
+         <property name="text"><string>Error Handling</string></property>
+         <property name="class" stdset="0"><string notr="true">navButton</string></property>
+         <property name="checkable"><bool>true</bool></property>
+         <property name="checked"><bool>false</bool></property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>52</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="spacer_43">
+         <property name="orientation"><enum>Qt::Vertical</enum></property>
+         <property name="sizeHint" stdset="0"><size><width>20</width><height>12</height></size></property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QWidget" name="opBlock" native="true">
+         <layout class="QVBoxLayout" name="opBlockLayout">
+          <property name="spacing"><number>5</number></property>
+          <property name="leftMargin"><number>0</number></property>
+          <property name="rightMargin"><number>0</number></property>
+          <property name="topMargin"><number>0</number></property>
+          <property name="bottomMargin"><number>0</number></property>
+          <item>
+           <widget class="QLabel" name="opHeader">
+            <property name="text"><string>OPERATIONAL STATUS</string></property>
+            <property name="class" stdset="0"><string notr="true">statusHeader</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="opLedRow">
+            <layout class="QHBoxLayout" name="opLedRowLayout">
+             <property name="spacing"><number>4</number></property>
+             <property name="leftMargin"><number>4</number></property>
+             <property name="rightMargin"><number>4</number></property>
+             <property name="topMargin"><number>4</number></property>
+             <property name="bottomMargin"><number>4</number></property>
+             <item>
+              <widget class="QLabel" name="opLed1">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="opLed2">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="opLed3">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="opLed4">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="opLed5">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="opLed6">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="faultBlock" native="true">
+         <layout class="QVBoxLayout" name="faultBlockLayout">
+          <property name="spacing"><number>5</number></property>
+          <property name="leftMargin"><number>0</number></property>
+          <property name="rightMargin"><number>0</number></property>
+          <property name="topMargin"><number>0</number></property>
+          <property name="bottomMargin"><number>0</number></property>
+          <item>
+           <widget class="QLabel" name="faultHeader">
+            <property name="text"><string>FAULT STATUS</string></property>
+            <property name="class" stdset="0"><string notr="true">statusHeader</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="faultLedRow">
+            <layout class="QHBoxLayout" name="faultLedRowLayout">
+             <property name="spacing"><number>4</number></property>
+             <property name="leftMargin"><number>4</number></property>
+             <property name="rightMargin"><number>4</number></property>
+             <property name="topMargin"><number>4</number></property>
+             <property name="bottomMargin"><number>4</number></property>
+             <item>
+              <widget class="QLabel" name="faultLed1">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="faultLed2">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="faultLed3">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="faultLed4">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="faultLed5">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="faultLed6">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="homingBlock" native="true">
+         <layout class="QVBoxLayout" name="homingBlockLayout">
+          <property name="spacing"><number>5</number></property>
+          <property name="leftMargin"><number>0</number></property>
+          <property name="rightMargin"><number>0</number></property>
+          <property name="topMargin"><number>0</number></property>
+          <property name="bottomMargin"><number>0</number></property>
+          <item>
+           <widget class="QLabel" name="homingHeader">
+            <property name="text"><string>HOMING STATUS</string></property>
+            <property name="class" stdset="0"><string notr="true">statusHeader</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="homingLedRow">
+            <layout class="QHBoxLayout" name="homingLedRowLayout">
+             <property name="spacing"><number>4</number></property>
+             <property name="leftMargin"><number>4</number></property>
+             <property name="rightMargin"><number>4</number></property>
+             <property name="topMargin"><number>4</number></property>
+             <property name="bottomMargin"><number>4</number></property>
+             <item>
+              <widget class="QLabel" name="homingLed1">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="homingLed2">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="homingLed3">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="homingLed4">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="homingLed5">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="homingLed6">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="emergencyBlock" native="true">
+         <layout class="QVBoxLayout" name="emergencyBlockLayout">
+          <property name="spacing"><number>5</number></property>
+          <property name="leftMargin"><number>0</number></property>
+          <property name="rightMargin"><number>0</number></property>
+          <property name="topMargin"><number>0</number></property>
+          <property name="bottomMargin"><number>0</number></property>
+          <item>
+           <widget class="QLabel" name="emergencyHeader">
+            <property name="text"><string>EMERGENCY STATUS</string></property>
+            <property name="class" stdset="0"><string notr="true">statusHeader</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="emergencyLedRow">
+            <layout class="QHBoxLayout" name="emergencyLedRowLayout">
+             <property name="spacing"><number>4</number></property>
+             <property name="leftMargin"><number>4</number></property>
+             <property name="rightMargin"><number>4</number></property>
+             <property name="topMargin"><number>4</number></property>
+             <property name="bottomMargin"><number>4</number></property>
+             <item>
+              <widget class="QLabel" name="emergencyLed1">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="emergencyLed2">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="emergencyLed3">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="emergencyLed4">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="emergencyLed5">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="emergencyLed6">
+               <property name="text"><string/></property>
+               <property name="class" stdset="0"><string notr="true">led</string></property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="spacer_56">
+         <property name="orientation"><enum>Qt::Vertical</enum></property>
+         <property name="sizeHint" stdset="0"><size><width>20</width><height>10</height></size></property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="homeResetLayout">
+         <property name="spacing"><number>8</number></property>
+         <item>
+          <widget class="QPushButton" name="homeButton">
+           <property name="text"><string>HOME</string></property>
+           <property name="class" stdset="0"><string notr="true">homeButton</string></property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>52</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="resetButton">
+           <property name="text"><string>RESET</string></property>
+           <property name="class" stdset="0"><string notr="true">resetButton</string></property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>52</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QPushButton" name="motionResetButton">
+         <property name="text"><string>MOTION RESET</string></property>
+         <property name="class" stdset="0"><string notr="true">motionResetButton</string></property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>56</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="emergencyStopButton">
+         <property name="text"><string>EMERGENCY
+STOP</string></property>
+         <property name="class" stdset="0"><string notr="true">emergencyStopButton</string></property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>74</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="systemStatusLabel">
+         <property name="text"><string>TIME : --:--:--
+UpTime: --
+Load: -- -- --</string></property>
+         <property name="class" stdset="0"><string notr="true">sysStatus</string></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="powerMenuButton">
+         <property name="text"><string>Power Menu</string></property>
+         <property name="class" stdset="0"><string notr="true">powerMenuButton</string></property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>48</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QWidget" name="mainArea" native="true">
+      <layout class="QVBoxLayout" name="mainAreaLayout">
+       <property name="spacing"><number>14</number></property>
+       <property name="leftMargin"><number>18</number></property>
+       <property name="rightMargin"><number>18</number></property>
+       <property name="topMargin"><number>16</number></property>
+       <property name="bottomMargin"><number>16</number></property>
+       <item>
+        <widget class="QFrame" name="headerBar">
+         <layout class="QHBoxLayout" name="headerBarLayout">
+          <property name="spacing"><number>10</number></property>
+          <property name="leftMargin"><number>18</number></property>
+          <property name="rightMargin"><number>18</number></property>
+          <property name="topMargin"><number>12</number></property>
+          <property name="bottomMargin"><number>12</number></property>
+          <item>
+           <widget class="QLabel" name="pageTitle">
+            <property name="text"><string>Point Planning UI</string></property>
+            <property name="class" stdset="0"><string notr="true">pageTitle</string></property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="spacer_128">
+            <property name="orientation"><enum>Qt::Horizontal</enum></property>
+            <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="servoOffButton">
+            <property name="text"><string>OFF</string></property>
+            <property name="class" stdset="0"><string notr="true">toggleOff</string></property>
+            <property name="checkable"><bool>true</bool></property>
+            <property name="checked"><bool>true</bool></property>
+            <property name="minimumSize">
+             <size>
+              <width>78</width>
+              <height>48</height>
+             </size>
+            </property>
+            <attribute name="buttonGroup"><string notr="true">servoPowerGroup</string></attribute>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="servoOnButton">
+            <property name="text"><string>ON</string></property>
+            <property name="class" stdset="0"><string notr="true">toggleOn</string></property>
+            <property name="checkable"><bool>true</bool></property>
+            <property name="minimumSize">
+             <size>
+              <width>78</width>
+              <height>48</height>
+             </size>
+            </property>
+            <attribute name="buttonGroup"><string notr="true">servoPowerGroup</string></attribute>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="wsCalibrationButton">
+            <property name="text"><string>WS-Calibration</string></property>
+            <property name="class" stdset="0"><string notr="true">btnBlue</string></property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="nexSimButton">
+            <property name="text"><string>NexSim</string></property>
+            <property name="class" stdset="0"><string notr="true">btnGrey</string></property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="reloadPointsButton">
+            <property name="text"><string>Reload Points</string></property>
+            <property name="class" stdset="0"><string notr="true">btnGrey</string></property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="viewYamlButton">
+            <property name="text"><string>View Points YAML</string></property>
+            <property name="class" stdset="0"><string notr="true">btnBlue</string></property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>48</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="bodyLayout">
+         <property name="spacing"><number>14</number></property>
+         <item>
+          <layout class="QVBoxLayout" name="editorColumnLayout">
+           <property name="spacing"><number>14</number></property>
+           <item>
+            <widget class="QFrame" name="pointEditorCard">
+             <layout class="QVBoxLayout" name="pointEditorLayout">
+              <property name="spacing"><number>10</number></property>
+              <property name="leftMargin"><number>16</number></property>
+              <property name="rightMargin"><number>16</number></property>
+              <property name="topMargin"><number>16</number></property>
+              <property name="bottomMargin"><number>16</number></property>
+              <item>
+               <widget class="QLabel" name="pointEditorTitle">
+                <property name="text"><string>Point Editor</string></property>
+                <property name="class" stdset="0"><string notr="true">cardTitle</string></property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="nameSeqLayout">
+                <property name="spacing"><number>10</number></property>
+                <item>
+                 <layout class="QVBoxLayout" name="nameFieldLayout">
+                  <item>
+                   <widget class="QLabel" name="pointNameLabel">
+                    <property name="text"><string>POINT NAME</string></property>
+                    <property name="class" stdset="0"><string notr="true">fieldLabel</string></property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="pointNameInput">
+                    <property name="placeholderText"><string>e.g., point-1</string></property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>46</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QVBoxLayout" name="seqFieldLayout">
+                  <item>
+                   <widget class="QLabel" name="sequenceLabel">
+                    <property name="text"><string>SEQUENCE</string></property>
+                    <property name="class" stdset="0"><string notr="true">fieldLabel</string></property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="sequenceInput">
+                    <property name="minimum"><number>1</number></property>
+                    <property name="maximum"><number>9999</number></property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>46</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="togglesLayout">
+                <property name="spacing"><number>10</number></property>
+                <item>
+                 <widget class="QCheckBox" name="enableTfCheck">
+                  <property name="text"><string>Enable TF</string></property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>46</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="editableCheck">
+                  <property name="text"><string>Editable</string></property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>46</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QLabel" name="natureLabel">
+                <property name="text"><string>NATURE</string></property>
+                <property name="class" stdset="0"><string notr="true">fieldLabel</string></property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPlainTextEdit" name="natureInput">
+                <property name="placeholderText"><string>e.g., test point</string></property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>86</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="dateTimeLabel">
+                <property name="text"><string>DATE TIME</string></property>
+                <property name="class" stdset="0"><string notr="true">fieldLabel</string></property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="dateTimeInput">
+                <property name="placeholderText"><string>Auto-generated</string></property>
+                <property name="readOnly"><bool>true</bool></property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>46</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="editorActionsLayout">
+                <property name="spacing"><number>10</number></property>
+                <item>
+                 <widget class="QPushButton" name="addPointButton">
+                  <property name="text"><string>Add Point</string></property>
+                  <property name="class" stdset="0"><string notr="true">btnBlue</string></property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>52</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="updatePointButton">
+                  <property name="text"><string>Update Point</string></property>
+                  <property name="class" stdset="0"><string notr="true">btnMuted</string></property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>52</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QFrame" name="tfPreviewCard">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>250</height>
+              </size>
+             </property>
+             <layout class="QVBoxLayout" name="tfPreviewLayout">
+              <property name="leftMargin"><number>12</number></property>
+              <property name="rightMargin"><number>12</number></property>
+              <property name="topMargin"><number>12</number></property>
+              <property name="bottomMargin"><number>12</number></property>
+              <item>
+               <layout class="QHBoxLayout" name="tfPreviewHeaderLayout">
+                <item>
+                 <widget class="QComboBox" name="tfFrameSelect">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>42</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="spacer_316">
+                  <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                  <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="tfLockButton">
+                  <property name="text"><string>Lock</string></property>
+                  <property name="class" stdset="0"><string notr="true">btnRedSmall</string></property>
+                  <property name="checkable"><bool>true</bool></property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>62</width>
+                    <height>42</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QWidget" name="tfCanvas" native="true">
+                <property name="class" stdset="0"><string notr="true">tfCanvas</string></property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QFrame" name="pointListCard">
+           <layout class="QVBoxLayout" name="pointListLayout">
+            <property name="spacing"><number>12</number></property>
+            <property name="leftMargin"><number>16</number></property>
+            <property name="rightMargin"><number>16</number></property>
+            <property name="topMargin"><number>16</number></property>
+            <property name="bottomMargin"><number>16</number></property>
+            <item>
+             <layout class="QHBoxLayout" name="pointListHeaderLayout">
+              <property name="spacing"><number>8</number></property>
+              <item>
+               <widget class="QLabel" name="pointListTitle">
+                <property name="text"><string>Point List</string></property>
+                <property name="class" stdset="0"><string notr="true">cardTitle</string></property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="pointCountLabel">
+                <property name="text"><string>0 points</string></property>
+                <property name="class" stdset="0"><string notr="true">countLabel</string></property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="spacer_360">
+                <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                <property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="pointListActionsLayout">
+              <property name="spacing"><number>8</number></property>
+              <item>
+               <widget class="QPushButton" name="manageAccessButton">
+                <property name="text"><string>Manage Access</string></property>
+                <property name="class" stdset="0"><string notr="true">btnPurple</string></property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>50</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="lockedButton">
+                <property name="text"><string>Locked</string></property>
+                <property name="class" stdset="0"><string notr="true">btnRed</string></property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>50</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="deleteAllButton">
+                <property name="text"><string>Delete All</string></property>
+                <property name="class" stdset="0"><string notr="true">btnRed</string></property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>50</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="undoButton">
+                <property name="text"><string>Undo</string></property>
+                <property name="class" stdset="0"><string notr="true">btnAmber</string></property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>50</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QListWidget" name="pointList">
+              <property name="class" stdset="0"><string notr="true">pointList</string></property>
+              <property name="spacing"><number>6</number></property>
+              <property name="verticalScrollMode"><enum>QAbstractItemView::ScrollPerPixel</enum></property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="controlColumnLayout">
+           <property name="spacing"><number>14</number></property>
+           <item>
+            <widget class="QFrame" name="movementControlCard">
+             <layout class="QVBoxLayout" name="movementControlLayout">
+              <property name="spacing"><number>12</number></property>
+              <property name="leftMargin"><number>16</number></property>
+              <property name="rightMargin"><number>16</number></property>
+              <property name="topMargin"><number>16</number></property>
+              <property name="bottomMargin"><number>16</number></property>
+              <item>
+               <widget class="QLabel" name="movementControlTitle">
+                <property name="text"><string>Robot Movement Control</string></property>
+                <property name="class" stdset="0"><string notr="true">cardTitle</string></property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="modeRowLayout">
+                <property name="spacing"><number>10</number></property>
+                <item>
+                 <layout class="QHBoxLayout" name="plannerGroupLayout">
+                  <property name="spacing"><number>0</number></property>
+                  <item>
+                   <widget class="QPushButton" name="omplButton">
+                    <property name="text"><string>OMPL</string></property>
+                    <property name="class" stdset="0"><string notr="true">segButton</string></property>
+                    <property name="checkable"><bool>true</bool></property>
+                    <property name="checked"><bool>true</bool></property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>46</height>
+                     </size>
+                    </property>
+                    <attribute name="buttonGroup"><string notr="true">plannerGroup</string></attribute>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pilzButton">
+                    <property name="text"><string>PILZ</string></property>
+                    <property name="class" stdset="0"><string notr="true">segButton</string></property>
+                    <property name="checkable"><bool>true</bool></property>
+                    <property name="checked"><bool>false</bool></property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>46</height>
+                     </size>
+                    </property>
+                    <attribute name="buttonGroup"><string notr="true">plannerGroup</string></attribute>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="modeGroupLayout">
+                  <property name="spacing"><number>0</number></property>
+                  <item>
+                   <widget class="QPushButton" name="safeAutoButton">
+                    <property name="text"><string>SafeAuto</string></property>
+                    <property name="class" stdset="0"><string notr="true">segButton</string></property>
+                    <property name="checkable"><bool>true</bool></property>
+                    <property name="checked"><bool>false</bool></property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>46</height>
+                     </size>
+                    </property>
+                    <attribute name="buttonGroup"><string notr="true">modeGroup</string></attribute>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="jogModeButton">
+                    <property name="text"><string>Jog</string></property>
+                    <property name="class" stdset="0"><string notr="true">segButton</string></property>
+                    <property name="checkable"><bool>true</bool></property>
+                    <property name="checked"><bool>true</bool></property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>46</height>
+                     </size>
+                    </property>
+                    <attribute name="buttonGroup"><string notr="true">modeGroup</string></attribute>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="autoModeButton">
+                    <property name="text"><string>Auto</string></property>
+                    <property name="class" stdset="0"><string notr="true">segButton</string></property>
+                    <property name="checkable"><bool>true</bool></property>
+                    <property name="checked"><bool>false</bool></property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>46</height>
+                     </size>
+                    </property>
+                    <attribute name="buttonGroup"><string notr="true">modeGroup</string></attribute>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="jogServoButton">
+                  <property name="text"><string>Jog Servo</string></property>
+                  <property name="class" stdset="0"><string notr="true">btnBlue</string></property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>50</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QFrame" name="jogCard">
+             <layout class="QHBoxLayout" name="jogCardLayout">
+              <property name="spacing"><number>14</number></property>
+              <property name="leftMargin"><number>16</number></property>
+              <property name="rightMargin"><number>16</number></property>
+              <property name="topMargin"><number>16</number></property>
+              <property name="bottomMargin"><number>16</number></property>
+              <item>
+               <widget class="QFrame" name="jointControlPanel">
+                <property name="class" stdset="0"><string notr="true">innerPanel</string></property>
+                <layout class="QVBoxLayout" name="jointControlLayout">
+                 <property name="spacing"><number>10</number></property>
+                 <property name="leftMargin"><number>14</number></property>
+                 <property name="rightMargin"><number>14</number></property>
+                 <property name="topMargin"><number>14</number></property>
+                 <property name="bottomMargin"><number>14</number></property>
+                 <item>
+                  <widget class="QLabel" name="jointControlTitle">
+                   <property name="text"><string>Joint Control</string></property>
+                   <property name="class" stdset="0"><string notr="true">cardTitle</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="jointRow1Layout">
+                   <property name="spacing"><number>8</number></property>
+                   <item>
+                    <widget class="QLabel" name="jointLabel1">
+                     <property name="text"><string>J1</string></property>
+                     <property name="class" stdset="0"><string notr="true">axisLabel</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>34</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="jointPlus1">
+                     <property name="text"><string>+</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogPlus</string></property>
+                     <property name="autoRepeat"><bool>false</bool></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="jointValue1">
+                     <property name="text"><string>0.00°</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogValue</string></property>
+                     <property name="alignment"><set>Qt::AlignCenter</set></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>84</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="jointMinus1">
+                     <property name="text"><string>-</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogMinus</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="jointRow2Layout">
+                   <property name="spacing"><number>8</number></property>
+                   <item>
+                    <widget class="QLabel" name="jointLabel2">
+                     <property name="text"><string>J2</string></property>
+                     <property name="class" stdset="0"><string notr="true">axisLabel</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>34</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="jointPlus2">
+                     <property name="text"><string>+</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogPlus</string></property>
+                     <property name="autoRepeat"><bool>false</bool></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="jointValue2">
+                     <property name="text"><string>0.00°</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogValue</string></property>
+                     <property name="alignment"><set>Qt::AlignCenter</set></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>84</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="jointMinus2">
+                     <property name="text"><string>-</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogMinus</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="jointRow3Layout">
+                   <property name="spacing"><number>8</number></property>
+                   <item>
+                    <widget class="QLabel" name="jointLabel3">
+                     <property name="text"><string>J3</string></property>
+                     <property name="class" stdset="0"><string notr="true">axisLabel</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>34</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="jointPlus3">
+                     <property name="text"><string>+</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogPlus</string></property>
+                     <property name="autoRepeat"><bool>false</bool></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="jointValue3">
+                     <property name="text"><string>0.00°</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogValue</string></property>
+                     <property name="alignment"><set>Qt::AlignCenter</set></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>84</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="jointMinus3">
+                     <property name="text"><string>-</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogMinus</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="jointRow4Layout">
+                   <property name="spacing"><number>8</number></property>
+                   <item>
+                    <widget class="QLabel" name="jointLabel4">
+                     <property name="text"><string>J4</string></property>
+                     <property name="class" stdset="0"><string notr="true">axisLabel</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>34</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="jointPlus4">
+                     <property name="text"><string>+</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogPlus</string></property>
+                     <property name="autoRepeat"><bool>false</bool></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="jointValue4">
+                     <property name="text"><string>0.00°</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogValue</string></property>
+                     <property name="alignment"><set>Qt::AlignCenter</set></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>84</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="jointMinus4">
+                     <property name="text"><string>-</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogMinus</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="jointRow5Layout">
+                   <property name="spacing"><number>8</number></property>
+                   <item>
+                    <widget class="QLabel" name="jointLabel5">
+                     <property name="text"><string>J5</string></property>
+                     <property name="class" stdset="0"><string notr="true">axisLabel</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>34</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="jointPlus5">
+                     <property name="text"><string>+</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogPlus</string></property>
+                     <property name="autoRepeat"><bool>false</bool></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="jointValue5">
+                     <property name="text"><string>0.00°</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogValue</string></property>
+                     <property name="alignment"><set>Qt::AlignCenter</set></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>84</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="jointMinus5">
+                     <property name="text"><string>-</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogMinus</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="jointRow6Layout">
+                   <property name="spacing"><number>8</number></property>
+                   <item>
+                    <widget class="QLabel" name="jointLabel6">
+                     <property name="text"><string>J6</string></property>
+                     <property name="class" stdset="0"><string notr="true">axisLabel</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>34</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="jointPlus6">
+                     <property name="text"><string>+</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogPlus</string></property>
+                     <property name="autoRepeat"><bool>false</bool></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="jointValue6">
+                     <property name="text"><string>0.00°</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogValue</string></property>
+                     <property name="alignment"><set>Qt::AlignCenter</set></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>84</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="jointMinus6">
+                     <property name="text"><string>-</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogMinus</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <spacer name="spacer_482">
+                   <property name="orientation"><enum>Qt::Vertical</enum></property>
+                   <property name="sizeHint" stdset="0"><size><width>20</width><height>10</height></size></property>
+                  </spacer>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="cartControlPanel">
+                <property name="class" stdset="0"><string notr="true">innerPanel</string></property>
+                <layout class="QVBoxLayout" name="cartControlLayout">
+                 <property name="spacing"><number>10</number></property>
+                 <property name="leftMargin"><number>14</number></property>
+                 <property name="rightMargin"><number>14</number></property>
+                 <property name="topMargin"><number>14</number></property>
+                 <property name="bottomMargin"><number>14</number></property>
+                 <item>
+                  <widget class="QLabel" name="cartControlTitle">
+                   <property name="text"><string>Cartesian Control</string></property>
+                   <property name="class" stdset="0"><string notr="true">cardTitle</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="cartRow1Layout">
+                   <property name="spacing"><number>8</number></property>
+                   <item>
+                    <widget class="QLabel" name="cartLabel1">
+                     <property name="text"><string>X</string></property>
+                     <property name="class" stdset="0"><string notr="true">axisLabel</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>34</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="cartPlus1">
+                     <property name="text"><string>+</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogPlus</string></property>
+                     <property name="autoRepeat"><bool>false</bool></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="cartValue1">
+                     <property name="text"><string>0.00 cm</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogValue</string></property>
+                     <property name="alignment"><set>Qt::AlignCenter</set></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>84</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="cartMinus1">
+                     <property name="text"><string>-</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogMinus</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="cartRow2Layout">
+                   <property name="spacing"><number>8</number></property>
+                   <item>
+                    <widget class="QLabel" name="cartLabel2">
+                     <property name="text"><string>Y</string></property>
+                     <property name="class" stdset="0"><string notr="true">axisLabel</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>34</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="cartPlus2">
+                     <property name="text"><string>+</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogPlus</string></property>
+                     <property name="autoRepeat"><bool>false</bool></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="cartValue2">
+                     <property name="text"><string>0.00 cm</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogValue</string></property>
+                     <property name="alignment"><set>Qt::AlignCenter</set></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>84</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="cartMinus2">
+                     <property name="text"><string>-</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogMinus</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="cartRow3Layout">
+                   <property name="spacing"><number>8</number></property>
+                   <item>
+                    <widget class="QLabel" name="cartLabel3">
+                     <property name="text"><string>Z</string></property>
+                     <property name="class" stdset="0"><string notr="true">axisLabel</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>34</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="cartPlus3">
+                     <property name="text"><string>+</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogPlus</string></property>
+                     <property name="autoRepeat"><bool>false</bool></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="cartValue3">
+                     <property name="text"><string>0.00 cm</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogValue</string></property>
+                     <property name="alignment"><set>Qt::AlignCenter</set></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>84</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="cartMinus3">
+                     <property name="text"><string>-</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogMinus</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="cartRow4Layout">
+                   <property name="spacing"><number>8</number></property>
+                   <item>
+                    <widget class="QLabel" name="cartLabel4">
+                     <property name="text"><string>R</string></property>
+                     <property name="class" stdset="0"><string notr="true">axisLabel</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>34</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="cartPlus4">
+                     <property name="text"><string>+</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogPlus</string></property>
+                     <property name="autoRepeat"><bool>false</bool></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="cartValue4">
+                     <property name="text"><string>0.00°</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogValue</string></property>
+                     <property name="alignment"><set>Qt::AlignCenter</set></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>84</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="cartMinus4">
+                     <property name="text"><string>-</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogMinus</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="cartRow5Layout">
+                   <property name="spacing"><number>8</number></property>
+                   <item>
+                    <widget class="QLabel" name="cartLabel5">
+                     <property name="text"><string>P</string></property>
+                     <property name="class" stdset="0"><string notr="true">axisLabel</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>34</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="cartPlus5">
+                     <property name="text"><string>+</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogPlus</string></property>
+                     <property name="autoRepeat"><bool>false</bool></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="cartValue5">
+                     <property name="text"><string>0.00°</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogValue</string></property>
+                     <property name="alignment"><set>Qt::AlignCenter</set></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>84</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="cartMinus5">
+                     <property name="text"><string>-</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogMinus</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="cartRow6Layout">
+                   <property name="spacing"><number>8</number></property>
+                   <item>
+                    <widget class="QLabel" name="cartLabel6">
+                     <property name="text"><string>W</string></property>
+                     <property name="class" stdset="0"><string notr="true">axisLabel</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>34</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="cartPlus6">
+                     <property name="text"><string>+</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogPlus</string></property>
+                     <property name="autoRepeat"><bool>false</bool></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="cartValue6">
+                     <property name="text"><string>0.00°</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogValue</string></property>
+                     <property name="alignment"><set>Qt::AlignCenter</set></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>84</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="cartMinus6">
+                     <property name="text"><string>-</string></property>
+                     <property name="class" stdset="0"><string notr="true">jogMinus</string></property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>62</width>
+                       <height>54</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <spacer name="spacer_507">
+                   <property name="orientation"><enum>Qt::Vertical</enum></property>
+                   <property name="sizeHint" stdset="0"><size><width>20</width><height>10</height></size></property>
+                  </spacer>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QFrame" name="servoFrameCard">
+             <layout class="QVBoxLayout" name="servoFrameLayout">
+              <property name="spacing"><number>12</number></property>
+              <property name="leftMargin"><number>16</number></property>
+              <property name="rightMargin"><number>16</number></property>
+              <property name="topMargin"><number>16</number></property>
+              <property name="bottomMargin"><number>16</number></property>
+              <item>
+               <layout class="QHBoxLayout" name="servoFrameHeaderLayout">
+                <item>
+                 <widget class="QLabel" name="servoFrameTitle">
+                  <property name="text"><string>Servo Frame</string></property>
+                  <property name="class" stdset="0"><string notr="true">cardTitle</string></property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="spacer_530">
+                  <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                  <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QLabel" name="activeFrameBadge">
+                  <property name="text"><string>ACTIVE  base_link</string></property>
+                  <property name="class" stdset="0"><string notr="true">activeBadge</string></property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>46</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QComboBox" name="servoFrameSelect">
+                <property name="class" stdset="0"><string notr="true">darkCombo</string></property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>54</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="spacer_549">
+             <property name="orientation"><enum>Qt::Vertical</enum></property>
+             <property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <buttongroups>
+  <buttongroup name="servoPowerGroup"/>
+  <buttongroup name="plannerGroup"/>
+  <buttongroup name="modeGroup"/>
+ </buttongroups>
+ <resources/>
+ <connections/>
+</ui>

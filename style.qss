@@ -1,0 +1,417 @@
+/* ==========================================================================
+   NextUp Robot Control — Qt stylesheet
+   Palette lifted from nextupWeb/public/mainWeb/*.css so the two UIs match.
+
+   Touch sizing rule: every interactive control is >= 46px tall. Jog buttons
+   are 54px because they are pressed with a gloved thumb and mis-hits move
+   the robot.
+
+   Class-based selectors use the dynamic "class" property set in the .ui,
+   e.g. [class="btnBlue"]. Qt does not support CSS classes natively, so this
+   dynamic-property trick is the supported equivalent.
+   ========================================================================== */
+
+QLabel {
+    background: transparent;
+    border: none;
+}
+
+QWidget {
+    background: #f1f5f9;
+    color: #0f172a;
+    font-family: "Inter", "Segoe UI", "Ubuntu", sans-serif;
+    font-size: 15px;
+}
+
+/* ─── Sidebar ─────────────────────────────────────────────────────────── */
+
+QWidget#sidebar {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #1f1f22, stop:1 #18181b);
+    border-right: 1px solid #2d2d2d;
+}
+
+QWidget#sidebar QLabel { color: #d0d0d0; background: transparent; }
+
+QLabel[class="pmTitle"] {
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 600;
+    padding-top: 4px;
+}
+
+QLabel[class="pmSubtitle"] {
+    color: #9ca3af;
+    font-size: 12px;
+    padding-bottom: 6px;
+}
+
+QPushButton[class="navButton"] {
+    background: transparent;
+    color: #d0d0d0;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    padding: 12px 14px;
+    text-align: left;
+}
+QPushButton[class="navButton"]:hover  { background: rgba(255, 255, 255, 0.08); }
+QPushButton[class="navButton"]:pressed { background: rgba(255, 255, 255, 0.14); }
+QPushButton[class="navButton"]:checked {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #2553eb, stop:1 #3b92f6);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* ─── Sidebar status LED blocks ───────────────────────────────────────── */
+
+QLabel[class="statusHeader"] {
+    color: #9ca3af;
+    min-height: 16px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+QFrame#opLedRow, QFrame#faultLedRow,
+QFrame#homingLedRow, QFrame#emergencyLedRow {
+    background: #222222;
+    border: 1px solid #333333;
+    border-radius: 6px;
+}
+
+/* LED. Runtime code sets the "state" property to "on" / "fault" / "warn"
+   and calls restyle(); Qt does not repaint on property change by itself. */
+QLabel[class="led"] {
+    background: #444444;
+    border: 1px solid #555555;
+    border-radius: 3px;
+    min-width: 20px;
+    min-height: 20px;
+}
+QLabel[class="led"][state="on"]    { background: #32ff32; border: 1px solid #64ff64; }
+QLabel[class="led"][state="fault"] { background: #F44336; border: 1px solid #ef5350; }
+QLabel[class="led"][state="warn"]  { background: #ffa726; border: 1px solid #ef6c00; }
+
+/* ─── Sidebar action buttons ──────────────────────────────────────────── */
+
+QPushButton[class="homeButton"],
+QPushButton[class="resetButton"],
+QPushButton[class="motionResetButton"],
+QPushButton[class="emergencyStopButton"],
+QPushButton[class="powerMenuButton"] {
+    color: rgb(230, 227, 227);
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px;
+}
+
+QPushButton[class="homeButton"]  { background: #066435; }
+QPushButton[class="homeButton"]:pressed  { background: #04502a; }
+QPushButton[class="resetButton"] { background: #036970; }
+QPushButton[class="motionResetButton"] { background: #6574ff; }
+QPushButton[class="emergencyStopButton"] {
+    background: #ac1a07;
+    font-size: 16px;
+    letter-spacing: 1px;
+}
+QPushButton[class="emergencyStopButton"]:pressed { background: #860d09; }
+QPushButton[class="powerMenuButton"] { background: #860d09; }
+
+QLabel[class="sysStatus"] {
+    color: #32ff32;
+    background: #111111;
+    border: 1px solid #2d2d2d;
+    border-radius: 6px;
+    font-family: "DejaVu Sans Mono", "Consolas", monospace;
+    font-size: 12px;
+    padding: 8px;
+}
+
+/* ─── Cards ───────────────────────────────────────────────────────────── */
+
+QFrame#headerBar, QFrame#pointEditorCard, QFrame#tfPreviewCard,
+QFrame#pointListCard, QFrame#movementControlCard,
+QFrame#jogCard, QFrame#servoFrameCard {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+}
+
+QFrame[class="innerPanel"] {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+}
+
+QLabel[class="pageTitle"] { font-size: 26px; font-weight: 700; color: #0f172a; }
+QLabel[class="cardTitle"] { font-size: 19px; font-weight: 700; color: #0f172a; }
+
+QLabel[class="fieldLabel"] {
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+}
+
+QLabel[class="countLabel"] {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* ─── Generic buttons ─────────────────────────────────────────────────── */
+
+QPushButton {
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 16px;
+}
+
+QPushButton[class="btnBlue"]   { background: #3b82f6; color: #ffffff; }
+QPushButton[class="btnBlue"]:hover   { background: #2563eb; }
+QPushButton[class="btnBlue"]:pressed { background: #1d4ed8; }
+
+QPushButton[class="btnGrey"]   { background: #94a3b8; color: #ffffff; }
+QPushButton[class="btnGrey"]:hover   { background: #64748b; }
+
+QPushButton[class="btnRed"]    { background: #ef4444; color: #ffffff; }
+QPushButton[class="btnRed"]:hover    { background: #dc2626; }
+
+QPushButton[class="btnRedSmall"] {
+    background: #ef4444; color: #ffffff;
+    font-size: 12px; padding: 6px 10px; border-radius: 8px;
+}
+
+QPushButton[class="btnPurple"] { background: #4f46e5; color: #ffffff; }
+QPushButton[class="btnPurple"]:hover { background: #4338ca; }
+
+QPushButton[class="btnAmber"]  { background: #f59e0b; color: #ffffff; }
+QPushButton[class="btnAmber"]:hover  { background: #d97706; }
+
+QPushButton[class="btnMuted"] {
+    background: #f1f5f9;
+    color: #94a3b8;
+    border: 1px solid #e2e8f0;
+}
+
+QPushButton:disabled { background: #e2e8f0; color: #94a3b8; }
+
+/* ─── Segmented toggles (OMPL/PILZ, SafeAuto/Jog/Auto, OFF/ON) ────────── */
+
+QPushButton[class="segButton"] {
+    background: #e2e8f0;
+    color: #475569;
+    border-radius: 0px;
+    font-weight: 600;
+    padding: 12px 18px;
+}
+QPushButton[class="segButton"]:hover   { background: #cbd5e1; }
+QPushButton[class="segButton"]:checked {
+    background: #ffffff;
+    color: #0f172a;
+    border: 2px solid #cbd5e1;
+    font-weight: 700;
+}
+
+/* round off the ends of each segmented group */
+QPushButton#omplButton, QPushButton#safeAutoButton {
+    border-top-left-radius: 10px; border-bottom-left-radius: 10px;
+}
+QPushButton#pilzButton, QPushButton#autoModeButton {
+    border-top-right-radius: 10px; border-bottom-right-radius: 10px;
+}
+
+QPushButton[class="toggleOff"] {
+    background: #94a3b8; color: #ffffff;
+    border-top-left-radius: 10px; border-bottom-left-radius: 10px;
+    border-top-right-radius: 0px; border-bottom-right-radius: 0px;
+}
+QPushButton[class="toggleOff"]:checked { background: #64748b; }
+
+QPushButton[class="toggleOn"] {
+    background: #e2e8f0; color: #64748b;
+    border-top-right-radius: 10px; border-bottom-right-radius: 10px;
+    border-top-left-radius: 0px; border-bottom-left-radius: 0px;
+}
+QPushButton[class="toggleOn"]:checked { background: #22c55e; color: #ffffff; }
+
+/* ─── Jog controls — the big touch targets ────────────────────────────── */
+
+QLabel[class="axisLabel"] {
+    color: #475569;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+QPushButton[class="jogPlus"] {
+    background: #22c55e;
+    color: #ffffff;
+    border-radius: 27px;
+    font-size: 26px;
+    font-weight: 700;
+    padding: 0px;
+}
+QPushButton[class="jogPlus"]:hover   { background: #16a34a; }
+QPushButton[class="jogPlus"]:pressed { background: #15803d; }
+
+QPushButton[class="jogMinus"] {
+    background: #ef4444;
+    color: #ffffff;
+    border-radius: 27px;
+    font-size: 26px;
+    font-weight: 700;
+    padding: 0px;
+}
+QPushButton[class="jogMinus"]:hover   { background: #dc2626; }
+QPushButton[class="jogMinus"]:pressed { background: #b91c1c; }
+
+QLabel[class="jogValue"] {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    color: #0f172a;
+    font-family: "DejaVu Sans Mono", "Consolas", monospace;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 8px 6px;
+}
+
+/* ─── Servo frame card ────────────────────────────────────────────────── */
+
+QLabel[class="activeBadge"] {
+    background: #0f172a;
+    color: #ffffff;
+    border-radius: 10px;
+    font-family: "DejaVu Sans Mono", "Consolas", monospace;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 18px;
+}
+
+QComboBox[class="darkCombo"] {
+    background: #1e293b;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    font-size: 15px;
+    padding: 12px 16px;
+}
+QComboBox[class="darkCombo"]::drop-down { border: none; width: 34px; }
+QComboBox[class="darkCombo"] QAbstractItemView {
+    background: #1e293b;
+    color: #e2e8f0;
+    selection-background-color: #3b82f6;
+    border: 1px solid #334155;
+    outline: none;
+}
+
+/* ─── Inputs ──────────────────────────────────────────────────────────── */
+
+QLineEdit, QPlainTextEdit, QSpinBox, QDoubleSpinBox, QComboBox {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    color: #0f172a;
+    font-size: 15px;
+    padding: 10px 14px;
+}
+QLineEdit:focus, QPlainTextEdit:focus, QSpinBox:focus,
+QDoubleSpinBox:focus, QComboBox:focus { border: 2px solid #3b82f6; }
+QLineEdit:read-only { background: #f1f5f9; color: #94a3b8; }
+
+/* Touch-sized spinbox steppers */
+QSpinBox::up-button, QDoubleSpinBox::up-button,
+QSpinBox::down-button, QDoubleSpinBox::down-button {
+    width: 30px;
+    background: #e2e8f0;
+    border: none;
+}
+QSpinBox::up-button, QDoubleSpinBox::up-button {
+    border-top-right-radius: 9px;
+    subcontrol-position: top right;
+}
+QSpinBox::down-button, QDoubleSpinBox::down-button {
+    border-bottom-right-radius: 9px;
+    subcontrol-position: bottom right;
+}
+
+QComboBox::drop-down { border: none; width: 34px; }
+
+/* ─── Checkboxes — enlarged for touch ─────────────────────────────────── */
+
+QCheckBox {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 14px;
+    spacing: 10px;
+}
+QCheckBox::indicator {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #cbd5e1;
+    border-radius: 6px;
+    background: #ffffff;
+}
+QCheckBox::indicator:checked {
+    background: #3b82f6;
+    border: 2px solid #3b82f6;
+}
+
+/* ─── Point list ──────────────────────────────────────────────────────── */
+
+QListWidget[class="pointList"] {
+    background: #ffffff;
+    border: none;
+    outline: none;
+}
+QListWidget[class="pointList"]::item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    color: #0f172a;
+    padding: 6px;
+    margin: 3px 2px;
+}
+QListWidget[class="pointList"]::item:selected {
+    background: #eff6ff;
+    border: 2px solid #3b82f6;
+    color: #0f172a;
+}
+
+QWidget#tfCanvas {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+
+/* ─── Scrollbars — wide enough to drag with a finger ──────────────────── */
+
+QScrollBar:vertical {
+    background: transparent;
+    width: 14px;
+    margin: 0px;
+}
+QScrollBar::handle:vertical {
+    background: #3b82f6;
+    border-radius: 7px;
+    min-height: 44px;
+}
+QScrollBar::handle:vertical:hover { background: #2563eb; }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: transparent; }
+
+QScrollBar:horizontal { background: transparent; height: 14px; }
+QScrollBar::handle:horizontal { background: #3b82f6; border-radius: 7px; min-width: 44px; }
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal { width: 0px; }
+
+QStatusBar { background: #ffffff; color: #64748b; border-top: 1px solid #e2e8f0; }
+QToolTip { background: #0f172a; color: #ffffff; border: none; padding: 8px; border-radius: 6px; }
